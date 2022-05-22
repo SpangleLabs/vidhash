@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "A package for hashing videos and checking for similarity"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/SpangleLabs/vidhash"
 
 [tool.poetry.dependencies]
 python = "^3.8"
