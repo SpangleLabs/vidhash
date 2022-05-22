@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "videohash"
+version = "0.1.0"
+description = "A package for hashing videos and checking for similarity"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+ImageHash = "^4.2.1"
+Pillow = "^9.1.1"
+ffmpy3 = "^0.2.4"
+numpy = "^1.22.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
