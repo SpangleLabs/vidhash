@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "videohash"
+name = "vidhash"
 version = "0.1.0"
 description = "A package for hashing videos and checking for similarity"
 authors = ["Your Name <you@example.com>"]
