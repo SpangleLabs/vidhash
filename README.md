@@ -1,5 +1,5 @@
 # Vidhash
-A perceptual video hashing and checking library, to detect similar videos, or videos containing similar scenes.
+[Vidhash](https://pypi.org/project/vidhash/) is a perceptual video hashing and checking library, to detect similar videos, or videos containing similar scenes.
 
 
 ## Todo
