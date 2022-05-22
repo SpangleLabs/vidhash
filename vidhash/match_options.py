@@ -1,7 +1,7 @@
 import math
 from abc import ABC, abstractmethod
 
-from videohash.main import VideoHash
+from vidhash.main import VideoHash
 
 
 class MatchOptions(ABC):

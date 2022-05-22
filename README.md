@@ -1,5 +1,5 @@
-# Videohash
-A video hashing and checking library
+# Vidhash
+A perceptual video hashing and checking library, to detect similar videos, or videos containing similar scenes.
 
 
 ## Todo

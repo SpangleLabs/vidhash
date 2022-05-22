@@ -11,8 +11,8 @@ import ffmpy3
 import imagehash
 from PIL import Image
 
-from videohash.hash_options import HashOptions
-from videohash.match_options import MatchOptions
+from vidhash.hash_options import HashOptions
+from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "temp/"
 
