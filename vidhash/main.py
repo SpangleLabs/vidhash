@@ -5,14 +5,17 @@ import pathlib
 import subprocess
 import uuid
 from multiprocessing.pool import ThreadPool
-from typing import Set, Dict, Optional, List, Tuple, Iterator
+from typing import TYPE_CHECKING
 
 import ffmpy3
-import imagehash
 from PIL import Image
 
-from vidhash.hash_options import HashOptions
-from vidhash.match_options import MatchOptions
+
+if TYPE_CHECKING:
+    from typing import Tuple, Iterator, Optional, Dict, List, Set
+    import imagehash
+    from vidhash.hash_options import HashOptions
+    from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "temp/"
 

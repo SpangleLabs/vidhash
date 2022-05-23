@@ -1,9 +1,12 @@
 import dataclasses
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import imagehash
 import numpy as np
-from PIL.Image import Image
+
+if TYPE_CHECKING:
+    from PIL.Image import Image
 
 
 class HashSettings(ABC):

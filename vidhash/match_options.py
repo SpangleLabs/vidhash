@@ -1,7 +1,9 @@
 import math
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from vidhash.main import VideoHash
+if TYPE_CHECKING:
+    from vidhash.main import VideoHash
 
 
 class MatchOptions(ABC):
