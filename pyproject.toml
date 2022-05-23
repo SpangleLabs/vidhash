@@ -20,6 +20,7 @@ flake8-black = "^0.3.3"
 mypy = "^0.950"
 black = "^22.3.0"
 flake8-type-checking = "^1.5.0"
+types-Pillow = "^9.0.15"
 
 [tool.black]
 line-length = 120
@@ -27,3 +28,6 @@ line-length = 120
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[mypy]
+mypy_path = "stubs"
