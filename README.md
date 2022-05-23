@@ -11,6 +11,4 @@
   - Datastore
     - (For looking up matching videos from a collection)
 - Documentation
-- Packaging
-  - And that type hinted flag
 - Tests
