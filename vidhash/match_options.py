@@ -44,12 +44,12 @@ class DurationMatch(MatchOptions):
     time_overlap: float = 0
 
     def _check_match_from(
-            self,
-            hash1: VideoHash,
-            start_frame1: int,
-            hash2: VideoHash,
-            start_frame2: int,
-            target_length: int
+        self,
+        hash1: VideoHash,
+        start_frame1: int,
+        hash2: VideoHash,
+        start_frame2: int,
+        target_length: int,
     ) -> bool:
         match_count = 0
         remaining_frames1 = hash1.image_hashes[start_frame1:]
@@ -65,9 +65,7 @@ class DurationMatch(MatchOptions):
 
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         frame_count = min(
-            math.ceil(hash1.hash_options.fps * self.time_overlap),
-            len(hash1.image_hashes),
-            len(hash2.image_hashes)
+            math.ceil(hash1.hash_options.fps * self.time_overlap), len(hash1.image_hashes), len(hash2.image_hashes)
         )
         shorter, longer = (hash1, hash2) if hash1.video_length < hash2.video_length else (hash2, hash1)
         for frame_num1 in range(len(shorter.image_hashes)):

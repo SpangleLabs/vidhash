@@ -7,7 +7,6 @@ from PIL.Image import Image
 
 
 class HashSettings(ABC):
-
     @property
     @abstractmethod
     def video_size(self) -> int:
@@ -24,7 +23,6 @@ class HashSettings(ABC):
 
 
 class DHash(HashSettings):
-
     def __init__(self, hash_size: int) -> None:
         self.hash_size = hash_size
 

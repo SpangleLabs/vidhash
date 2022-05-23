@@ -16,6 +16,10 @@ numpy = "^1.22.4"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^4.0.1"
+flake8-black = "^0.3.3"
+
+[tool.black]
+line-length = 120
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
