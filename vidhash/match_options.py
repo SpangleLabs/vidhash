@@ -62,6 +62,7 @@ class DurationMatch(MatchOptions):
             match_count += 1
             if match_count >= target_length:
                 return True
+        return match_count >= target_length
 
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         frame_count = min(

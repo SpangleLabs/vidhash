@@ -20,6 +20,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
           pip install flake8-black
+          pip install flake8-type-checking
+          pip install mypy
       - name: "Run flake8"
         run: |
           flake8
+      - name: "Run mypy"
+        run: |
+          mypy vidhash
