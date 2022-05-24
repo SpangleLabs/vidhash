@@ -23,10 +23,10 @@ TEMP_DIR = "temp/"
 
 async def _process_ffmpeg(ff: ffmpy3.FFmpeg) -> Tuple[str, str]:
     ff_process = await ff.run_async(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ff_out = await ff_process.communicate()
+    out_bytes, err_bytes = await ff_process.communicate()
     await ff.wait()
-    output = ff_out[0].decode("utf-8", errors="replace").strip()
-    error = ff_out[1].decode("utf-8", errors="replace").strip()
+    output = out_bytes.decode("utf-8", errors="replace").strip()
+    error = err_bytes.decode("utf-8", errors="replace").strip()
     return output, error
 
 
