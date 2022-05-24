@@ -1,9 +1,11 @@
 import dataclasses
-from typing import List, Set, Iterator
+from typing import TYPE_CHECKING
 
-import imagehash
 
-from vidhash.hash_options import HashOptions
+if TYPE_CHECKING:
+    from typing import List, Set, Iterator
+    import imagehash
+    from vidhash.hash_options import HashOptions
 
 
 @dataclasses.dataclass
