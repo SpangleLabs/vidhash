@@ -1,25 +1,29 @@
 from __future__ import annotations
-import dataclasses
+
 import glob
 import os
 import pathlib
 import shutil
 import subprocess
 import uuid
+from dataclasses import dataclass
 from multiprocessing.pool import ThreadPool
 from typing import TYPE_CHECKING
 
 import ffmpy3
 from PIL import Image
 
+from vidhash.hash_options import HashOptions
+from vidhash.match_options import PercentageMatch
 from vidhash.video_hash import VideoHash
 
 if TYPE_CHECKING:
     from typing import Tuple, Optional, Dict, List
-    from vidhash.hash_options import HashOptions
     from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "vidhash_temp/"
+DEFAULT_HASH_OPTS = HashOptions()
+DEFAULT_MATCH_OPTS = PercentageMatch(3, 20)
 
 
 async def _process_ffmpeg(ff: ffmpy3.FFmpeg) -> Tuple[str, str]:
@@ -92,7 +96,8 @@ async def _video_length(video_path: str) -> float:
     return float(out)
 
 
-async def hash_video(video_path: str, options: HashOptions) -> VideoHash:
+async def hash_video(video_path: str, hash_options: HashOptions = None) -> VideoHash:
+    options = hash_options or DEFAULT_HASH_OPTS
     # Get video length
     video_length = await _video_length(video_path)
     # Decompose into images
@@ -110,13 +115,13 @@ async def hash_video(video_path: str, options: HashOptions) -> VideoHash:
     return VideoHash(hash_list, video_length, options)
 
 
-@dataclasses.dataclass
+@dataclass(eq=True, frozen=True)
 class CheckOptions:
-    hash_options: HashOptions
-    match_options: MatchOptions
+    hash_options: HashOptions = DEFAULT_HASH_OPTS
+    match_options: MatchOptions = DEFAULT_MATCH_OPTS
 
 
-async def check_match(video_path_1: str, video_path_2: str, options: CheckOptions) -> bool:
+async def check_match(video_path_1: str, video_path_2: str, options: CheckOptions = CheckOptions()) -> bool:
     hash1 = await hash_video(video_path_1, options.hash_options)
     hash2 = await hash_video(video_path_2, options.hash_options)
     return options.match_options.check_match(hash1, hash2)
