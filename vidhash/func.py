@@ -3,6 +3,7 @@ import dataclasses
 import glob
 import os
 import pathlib
+import shutil
 import subprocess
 import uuid
 from multiprocessing.pool import ThreadPool
@@ -44,25 +45,43 @@ async def _run_ffprobe(inputs: Dict[str, Optional[str]], global_options: Optiona
     return await _process_ffmpeg(ff)
 
 
+def _cleanup_file(path: str) -> None:
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+
+
+def _cleanup_dir(path: str) -> None:
+    try:
+        shutil.rmtree(path)
+    except FileNotFoundError:
+        pass
+
+
 async def _decompose_video(video_path: str, decompose_path: str, fps: float, max_size: float) -> None:
     # Convert video and downscale
-    output_path = pathlib.Path(TEMP_DIR) / f"{uuid.uuid4()}.mp4"
+    output_path = str(pathlib.Path(TEMP_DIR) / f"{uuid.uuid4()}.mp4")
     filters = [
         f"scale='min({max_size},iw)':'min({max_size},ih)':force_original_aspect_ratio=decrease",
         "scale=trunc(iw/2)*2:trunc(ih/2)*2",
     ]
     os.makedirs(TEMP_DIR, exist_ok=True)
-    await _run_ffmpeg(
-        inputs={video_path: None},
-        outputs={f"{output_path}": f"-vf \"{','.join(filters)}\""},
-    )
-    # Decompose it
-    os.makedirs(decompose_path, exist_ok=True)
-    await _run_ffmpeg(
-        inputs={f"{output_path}": None},
-        outputs={f"{decompose_path}/out%d.png": f"-vf fps={fps} -vsync 0"},
-        global_options=["-y"],
-    )
+    try:
+        await _run_ffmpeg(
+            inputs={video_path: None},
+            outputs={output_path: f"-vf \"{','.join(filters)}\""},
+        )
+        # Decompose it
+        os.makedirs(decompose_path, exist_ok=True)
+        await _run_ffmpeg(
+            inputs={output_path: None},
+            outputs={f"{decompose_path}/out%d.png": f"-vf fps={fps} -vsync 0"},
+            global_options=["-y"],
+        )
+    finally:
+        # Clean up the temporary video file
+        _cleanup_file(output_path)
 
 
 async def _video_length(video_path: str) -> float:
@@ -79,11 +98,14 @@ async def hash_video(video_path: str, options: HashOptions) -> VideoHash:
     # Decompose into images
     video_id = str(uuid.uuid4())
     decompose_path = str(pathlib.Path(TEMP_DIR) / video_id)
-    await _decompose_video(video_path, decompose_path, options.fps, options.settings.video_size)
-    # Hash images
-    image_files = glob.glob(f"{decompose_path}/*.png")
-    hash_pool = ThreadPool(os.cpu_count())
-    hash_list = hash_pool.map(lambda image_path: options.settings.hash_image(Image.open(image_path)), image_files)
+    try:
+        await _decompose_video(video_path, decompose_path, options.fps, options.settings.video_size)
+        # Hash images
+        image_files = glob.glob(f"{decompose_path}/*.png")
+        hash_pool = ThreadPool(os.cpu_count())
+        hash_list = hash_pool.map(lambda image_path: options.settings.hash_image(Image.open(image_path)), image_files)
+    finally:
+        _cleanup_dir(decompose_path)
     # Create VideoHash and return
     return VideoHash(hash_list, video_length, options)
 
