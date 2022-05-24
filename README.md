@@ -6,7 +6,6 @@
 - Code
   - Ability to ignore blank frames
   - Ensure hash settings are the same when checking similarity
-    - Make hash settings immutable?
   - Wrapper for imagehash.ImageHash
   - Datastore
     - (For looking up matching videos from a collection)
