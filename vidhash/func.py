@@ -51,11 +51,13 @@ async def _decompose_video(video_path: str, decompose_path: str, fps: float, max
         f"scale='min({max_size},iw)':'min({max_size},ih)':force_original_aspect_ratio=decrease",
         "scale=trunc(iw/2)*2:trunc(ih/2)*2",
     ]
+    os.makedirs(TEMP_DIR, exist_ok=True)
     await _run_ffmpeg(
         inputs={video_path: None},
         outputs={f"{output_path}": f"-vf \"{','.join(filters)}\""},
     )
     # Decompose it
+    os.makedirs(decompose_path, exist_ok=True)
     await _run_ffmpeg(
         inputs={f"{output_path}": None},
         outputs={f"{decompose_path}/out%d.png": f"-vf fps={fps} -vsync 0"},
