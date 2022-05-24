@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from vidhash.main import VideoHash
+    from vidhash.video_hash import VideoHash
 
 
 class MatchOptions(ABC):

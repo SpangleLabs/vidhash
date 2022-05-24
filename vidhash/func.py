@@ -10,33 +10,14 @@ from typing import TYPE_CHECKING
 import ffmpy3
 from PIL import Image
 
+from vidhash.video_hash import VideoHash
 
 if TYPE_CHECKING:
-    from typing import Tuple, Iterator, Optional, Dict, List, Set
-    import imagehash
+    from typing import Tuple, Optional, Dict, List
     from vidhash.hash_options import HashOptions
     from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "temp/"
-
-
-@dataclasses.dataclass
-class VideoHash:
-    image_hashes: List[imagehash.ImageHash]
-    video_length: float
-    hash_options: HashOptions
-
-    @property
-    def hash_set(self) -> Set[imagehash.ImageHash]:
-        return set(self.image_hashes)
-
-    def matching_hashes(self, other_hash: imagehash.ImageHash, hamming_dist: int = 0) -> Iterator[imagehash.ImageHash]:
-        for image_hash in self.hash_set:
-            if (image_hash - other_hash) <= hamming_dist:
-                yield image_hash
-
-    def contains_hash(self, other_hash: imagehash.ImageHash, hamming_dist: int = 0) -> bool:
-        return any(self.matching_hashes(other_hash, hamming_dist))
 
 
 async def _process_ffmpeg(ff: ffmpy3.FFmpeg) -> Tuple[str, str]:
