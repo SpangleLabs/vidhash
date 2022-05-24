@@ -1,5 +1,5 @@
-from vidhash.func import hash_video, check_match
-from vidhash.hash_options import HashSettings, HashOptions
+from vidhash.func import check_match, hash_video
+from vidhash.hash_options import HashOptions, HashSettings
 from vidhash.match_options import MatchOptions
 from vidhash.video_hash import VideoHash
 

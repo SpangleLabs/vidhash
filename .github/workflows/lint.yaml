@@ -24,3 +24,6 @@ jobs:
       - name: "Run mypy"
         run: |
           poetry run mypy vidhash
+      - name: "Run isort"
+        run: |
+          poetry run isort vidhash --check

@@ -18,7 +18,8 @@ from vidhash.match_options import PercentageMatch
 from vidhash.video_hash import VideoHash
 
 if TYPE_CHECKING:
-    from typing import Tuple, Optional, Dict, List
+    from typing import Dict, List, Optional, Tuple
+
     from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "vidhash_temp/"

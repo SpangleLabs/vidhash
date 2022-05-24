@@ -1,9 +1,8 @@
-from typing import Callable, Optional, Tuple, List
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
 from PIL.Image import Image
-
 
 class ImageHash:
     hash: npt.NDArray[np.bool_]

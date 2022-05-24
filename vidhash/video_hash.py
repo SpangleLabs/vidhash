@@ -1,11 +1,13 @@
 from __future__ import annotations
+
 import dataclasses
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from typing import List, Set, Iterator
+    from typing import Iterator, List, Set
+
     import imagehash
+
     from vidhash.hash_options import HashOptions
 
 
