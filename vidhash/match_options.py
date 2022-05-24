@@ -1,12 +1,14 @@
 from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from vidhash.video_hash import VideoHash
 
 
+@dataclass(eq=True, frozen=True)  # type: ignore[misc]
 class MatchOptions(ABC):
     hamming_dist: int = 0
 
@@ -25,24 +27,27 @@ def _has_overlap(hash1: VideoHash, hash2: VideoHash, required_overlap: float, ha
     return False
 
 
+@dataclass(eq=True, frozen=True)
 class PercentageMatch(MatchOptions):
     percentage_overlap: float = 50
-    ignore_blank: bool = True  # TODO
+    ignore_blank: bool = True
 
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         required_overlap = self.percentage_overlap * min(len(hash1.hash_set), len(hash2.hash_set)) / 100
         return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
 
 
+@dataclass(eq=True, frozen=True)
 class AbsoluteMatch(MatchOptions):
     count_overlap: int = 1
-    ignore_blank: bool = True  # TODO
+    ignore_blank: bool = True
 
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         required_overlap = min(self.count_overlap, len(hash1.hash_set), len(hash2.hash_set))
         return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
 
 
+@dataclass(eq=True, frozen=True)
 class DurationMatch(MatchOptions):
     time_overlap: float = 0
 
