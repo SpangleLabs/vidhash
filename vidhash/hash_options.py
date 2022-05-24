@@ -1,6 +1,6 @@
 from __future__ import annotations
-import dataclasses
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import imagehash
@@ -26,23 +26,23 @@ class HashSettings(ABC):
         pass
 
 
+@dataclass(eq=True, frozen=True)
 class DHash(HashSettings):
-    def __init__(self, hash_size: int) -> None:
-        self.hash_size = hash_size
+    hash_size: int = 8
 
     def hash_image(self, img: Image) -> imagehash.ImageHash:
         return imagehash.dhash(img, hash_size=self.hash_size)
 
     @property
     def video_size(self) -> int:
-        return self.hash_size * 4
+        return self.hash_size * 10
 
     @property
     def blank_hash(self) -> imagehash.ImageHash:
         return imagehash.ImageHash(np.zeros([self.hash_size, self.hash_size], dtype=bool))
 
 
-@dataclasses.dataclass
-class HashOptions:  # TODO: immutable
+@dataclass(eq=True, frozen=True)
+class HashOptions:
     fps: float = 5
     settings: HashSettings = DHash(8)
