@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from vidhash.hash_options import HashOptions
     from vidhash.match_options import MatchOptions
 
-TEMP_DIR = "temp/"
+TEMP_DIR = "vidhash_temp/"
 
 
 async def _process_ffmpeg(ff: ffmpy3.FFmpeg) -> Tuple[str, str]:
