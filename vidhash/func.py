@@ -40,7 +40,7 @@ async def _run_ffmpeg(
 
 
 async def _run_ffprobe(inputs: Dict[str, Optional[str]], global_options: Optional[List[str]] = None) -> Tuple[str, str]:
-    ff = ffmpy3.FFmpeg(global_options=global_options, inputs=inputs)
+    ff = ffmpy3.FFprobe(global_options=global_options, inputs=inputs)
     return await _process_ffmpeg(ff)
 
 
