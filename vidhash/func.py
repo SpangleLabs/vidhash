@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import logging
 import os
 import pathlib
 import shutil
@@ -27,9 +28,13 @@ DEFAULT_HASH_OPTS = HashOptions()
 DEFAULT_MATCH_OPTS = PercentageMatch(3, 20)
 
 
+logger = logging.getLogger(__name__)
+
+
 async def _process_ffmpeg(ff: ffmpy3.FFmpeg) -> Tuple[str, str]:
     ff_process = await ff.run_async(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out_bytes, err_bytes = await ff_process.communicate()
+    logger.debug("FF process ended with exit code %s", ff_process.returncode)
     await ff.wait()
     output = out_bytes.decode("utf-8", errors="replace").strip()
     error = err_bytes.decode("utf-8", errors="replace").strip()
@@ -41,17 +46,20 @@ async def _run_ffmpeg(
     outputs: Dict[str, Optional[str]],
     global_options: Optional[List[str]] = None,
 ) -> Tuple[str, str]:
+    logger.debug("Running FFmpeg: global=%s, inputs=%s, outputs=%s", global_options, inputs, outputs)
     ff = ffmpy3.FFmpeg(global_options=global_options, inputs=inputs, outputs=outputs)
     return await _process_ffmpeg(ff)
 
 
 async def _run_ffprobe(inputs: Dict[str, Optional[str]], global_options: Optional[List[str]] = None) -> Tuple[str, str]:
+    logger.debug("Running FFProbe: global=%s, inputs=%s", global_options, inputs)
     ff = ffmpy3.FFprobe(global_options=global_options, inputs=inputs)
     return await _process_ffmpeg(ff)
 
 
 def _cleanup_file(path: str) -> None:
     try:
+        logger.debug("Cleaning up file: %s", path)
         os.remove(path)
     except FileNotFoundError:
         pass
@@ -59,6 +67,7 @@ def _cleanup_file(path: str) -> None:
 
 def _cleanup_dir(path: str) -> None:
     try:
+        logger.debug("Cleaning up directory: %s", path)
         shutil.rmtree(path)
     except FileNotFoundError:
         pass
@@ -73,12 +82,14 @@ async def _decompose_video(video_path: str, decompose_path: str, fps: float, max
     ]
     os.makedirs(TEMP_DIR, exist_ok=True)
     try:
+        logger.debug("Converting and downscaling video %s to %s", video_path, output_path)
         await _run_ffmpeg(
             inputs={video_path: None},
             outputs={output_path: f"-vf \"{','.join(filters)}\""},
         )
         # Decompose it
         os.makedirs(decompose_path, exist_ok=True)
+        logger.debug("Decomposing video (%s) into frames in %s at %s FPS", output_path, decompose_path, fps)
         await _run_ffmpeg(
             inputs={output_path: None},
             outputs={f"{decompose_path}/out%d.png": f"-vf fps={fps} -vsync 0"},
@@ -90,17 +101,21 @@ async def _decompose_video(video_path: str, decompose_path: str, fps: float, max
 
 
 async def _video_length(video_path: str) -> float:
+    logger.debug("Getting length of video %s", video_path)
     out, err = await _run_ffprobe(
         inputs={video_path: "-show_entries format=duration -of default=noprint_wrappers=1:nokey=1"},
         global_options=["-v error"],
     )
+    logger.debug("Length of video %s is: %s", video_path, out)
     return float(out)
 
 
 async def hash_video(video_path: str, hash_options: HashOptions = None) -> VideoHash:
     options = hash_options or DEFAULT_HASH_OPTS
+    logger.info("Hashing video: %s with options: %s", video_path, hash_options)
     # Get video length
     video_length = await _video_length(video_path)
+    logger.info("Got video length: %s (%s)", video_length, video_path)
     # Decompose into images
     video_id = str(uuid.uuid4())
     decompose_path = str(pathlib.Path(TEMP_DIR) / video_id)
