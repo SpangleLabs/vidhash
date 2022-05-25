@@ -109,3 +109,6 @@ class DurationMatch(MatchOptions):
                 if self._check_match_from(shorter, frame_num1, longer, frame_num2, frame_count):
                     return True
         return False
+
+
+DEFAULT_MATCH_OPTS = PercentageMatch(3, 20)

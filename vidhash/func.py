@@ -14,19 +14,17 @@ from typing import TYPE_CHECKING
 import ffmpy3
 from PIL import Image
 
-from vidhash.hash_options import HashOptions
-from vidhash.match_options import PercentageMatch
+from vidhash.hash_options import DEFAULT_HASH_OPTS
+from vidhash.match_options import DEFAULT_MATCH_OPTS
 from vidhash.video_hash import VideoHash
 
 if TYPE_CHECKING:
     from typing import Dict, List, Optional, Tuple
 
+    from vidhash.hash_options import HashOptions
     from vidhash.match_options import MatchOptions
 
 TEMP_DIR = "vidhash_temp/"
-DEFAULT_HASH_OPTS = HashOptions()
-DEFAULT_MATCH_OPTS = PercentageMatch(3, 20)
-
 
 logger = logging.getLogger(__name__)
 
@@ -137,7 +135,8 @@ class CheckOptions:
     match_options: MatchOptions = DEFAULT_MATCH_OPTS
 
 
-async def check_match(video_path_1: str, video_path_2: str, options: CheckOptions = CheckOptions()) -> bool:
+async def check_match(video_path_1: str, video_path_2: str, options: CheckOptions = None) -> bool:
+    options = options or CheckOptions(DEFAULT_HASH_OPTS, DEFAULT_MATCH_OPTS)
     hash1 = await hash_video(video_path_1, options.hash_options)
     hash2 = await hash_video(video_path_2, options.hash_options)
     return options.match_options.check_match(hash1, hash2)

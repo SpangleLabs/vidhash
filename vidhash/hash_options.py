@@ -47,3 +47,6 @@ class DHash(HashSettings):
 class HashOptions:
     fps: float = 5
     settings: HashSettings = DHash(8)
+
+
+DEFAULT_HASH_OPTS = HashOptions()
