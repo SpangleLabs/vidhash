@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -9,12 +10,25 @@ if TYPE_CHECKING:
     from vidhash.video_hash import VideoHash
 
 
+logger = logging.getLogger(__name__)
+
+
+class MatchException(ValueError):
+    pass
+
+
 @dataclass(eq=True, frozen=True)  # type: ignore[misc]
 class MatchOptions(ABC):
     hamming_dist: int = 0
 
-    @abstractmethod
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
+        logger.info("Checking match between hashes using %s", self.__class__.__name__)
+        if hash1.hash_options != hash2.hash_options:
+            raise MatchException("Video hashes were not created with the same hash options, so cannot be compared.")
+        return self._check_match(hash1, hash2)
+
+    @abstractmethod
+    def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         pass
 
 
@@ -23,6 +37,7 @@ def _has_overlap(hash1: VideoHash, hash2: VideoHash, required_overlap: float, ha
     for image_hash in hash1.hash_set:
         if hash2.contains_hash(image_hash, hamming_distance):
             overlaps += 1
+            logger.debug("Found %s of %s overlaps", overlaps, required_overlap)
             if overlaps >= required_overlap:
                 return True
     return False
@@ -33,8 +48,11 @@ class PercentageMatch(MatchOptions):
     percentage_overlap: float = 50
     ignore_blank: bool = True
 
-    def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
+    def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         required_overlap = self.percentage_overlap * min(len(hash1.hash_set), len(hash2.hash_set)) / 100
+        logger.debug(
+            "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
+        )
         return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
 
 
@@ -43,8 +61,11 @@ class AbsoluteMatch(MatchOptions):
     count_overlap: int = 1
     ignore_blank: bool = True
 
-    def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
+    def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         required_overlap = min(self.count_overlap, len(hash1.hash_set), len(hash2.hash_set))
+        logger.debug(
+            "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
+        )
         return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
 
 
@@ -73,9 +94,14 @@ class DurationMatch(MatchOptions):
                 return True
         return match_count >= target_length
 
-    def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
+    def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         frame_count = min(
             math.ceil(hash1.hash_options.fps * self.time_overlap), len(hash1.image_hashes), len(hash2.image_hashes)
+        )
+        logger.debug(
+            "Will need at least %s frames in a row which match within %s hamming distance",
+            frame_count,
+            self.hamming_dist,
         )
         shorter, longer = (hash1, hash2) if hash1.video_length < hash2.video_length else (hash2, hash1)
         for frame_num1 in range(len(shorter.image_hashes)):
