@@ -43,3 +43,6 @@ class VideoHash:
     def matches_hash(self, other_hash: VideoHash, match_options: MatchOptions = None) -> bool:
         match_options = match_options or DEFAULT_MATCH_OPTS
         return match_options.check_match(self, other_hash)
+
+    def has_blank_frame(self) -> bool:
+        return self.hash_options.settings.blank_hash in self.hash_set

@@ -56,6 +56,8 @@ async def test_two_different_scenes(butterfly_react_clip, butterfly_kill_clip):
 async def test_blank_match(intro_clip, credits_clip):
     intro_hash = await vidhash.hash_video(str(intro_clip))
     credits_hash = await vidhash.hash_video(str(credits_clip))
+    assert intro_hash.has_blank_frame()
+    assert credits_hash.has_blank_frame()
     match = FrameCountMatch(hamming_dist=0, count_overlap=1, ignore_blank=False)
     assert match.check_match(intro_hash, credits_hash)
 
