@@ -118,7 +118,7 @@ async def hash_video(video_path: str, hash_options: HashOptions = None) -> Video
     video_id = str(uuid.uuid4())
     decompose_path = str(pathlib.Path(TEMP_DIR) / video_id)
     try:
-        await _decompose_video(video_path, decompose_path, options.fps, options.settings.video_size)
+        await _decompose_video(video_path, decompose_path, options.fps, options.settings.get_video_size())
         # Hash images
         image_files = glob.glob(f"{decompose_path}/*.png")
         # Sort by filename number, stripping "out" prefix and extension

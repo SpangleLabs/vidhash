@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import imagehash
 import numpy as np
@@ -12,9 +12,8 @@ if TYPE_CHECKING:
 
 
 class HashSettings(ABC):
-    @property
     @abstractmethod
-    def video_size(self) -> int:
+    def get_video_size(self) -> int:
         pass
 
     @property
@@ -30,13 +29,15 @@ class HashSettings(ABC):
 @dataclass(eq=True, frozen=True)
 class DHash(HashSettings):
     hash_size: int = 8
+    video_size: Optional[int] = None
 
     def hash_image(self, img: Image) -> imagehash.ImageHash:
         return imagehash.dhash(img, hash_size=self.hash_size)
 
-    @property
-    def video_size(self) -> int:
-        return self.hash_size * 100
+    def get_video_size(self) -> int:
+        if self.video_size is None:
+            return self.hash_size * 25
+        return self.video_size
 
     @property
     def blank_hash(self) -> imagehash.ImageHash:
