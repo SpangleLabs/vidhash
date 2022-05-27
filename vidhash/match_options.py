@@ -19,7 +19,7 @@ class MatchException(ValueError):
 
 @dataclass(eq=True, frozen=True)  # type: ignore[misc]
 class MatchOptions(ABC):
-    hamming_dist: int = 0
+    hamming_dist: int = 3
 
     def check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         logger.info("Checking match between hashes using %s", self.__class__.__name__)
@@ -45,7 +45,7 @@ def _has_overlap(hash1: VideoHash, hash2: VideoHash, required_overlap: float, ha
 
 @dataclass(eq=True, frozen=True)
 class PercentageMatch(MatchOptions):
-    percentage_overlap: float = 50
+    percentage_overlap: float = 30
     ignore_blank: bool = True
 
     def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
@@ -58,7 +58,7 @@ class PercentageMatch(MatchOptions):
 
 @dataclass(eq=True, frozen=True)
 class AbsoluteMatch(MatchOptions):
-    count_overlap: int = 1
+    count_overlap: int = 3
     ignore_blank: bool = True
 
     def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
@@ -71,7 +71,7 @@ class AbsoluteMatch(MatchOptions):
 
 @dataclass(eq=True, frozen=True)
 class DurationMatch(MatchOptions):
-    time_overlap: float = 0
+    time_overlap: float = 3
 
     def _check_match_from(
         self,
@@ -111,4 +111,4 @@ class DurationMatch(MatchOptions):
         return False
 
 
-DEFAULT_MATCH_OPTS = PercentageMatch(3, 20)
+DEFAULT_MATCH_OPTS = PercentageMatch(3, 30)
