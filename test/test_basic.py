@@ -3,10 +3,6 @@ from vidhash import VideoHash
 from vidhash.match_options import FrameCountMatch, PercentageMatch
 
 
-async def test_long_video_length(long_video):
-    assert long_video is not None
-
-
 async def test_hash_scene(butterfly_react_clip):
     video_hash = await vidhash.hash_video(str(butterfly_react_clip))
     assert video_hash is not None
