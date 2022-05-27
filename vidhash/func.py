@@ -121,6 +121,8 @@ async def hash_video(video_path: str, hash_options: HashOptions = None) -> Video
         await _decompose_video(video_path, decompose_path, options.fps, options.settings.video_size)
         # Hash images
         image_files = glob.glob(f"{decompose_path}/*.png")
+        # Sort by filename number, stripping "out" prefix and extension
+        image_files.sort(key=lambda f: int(os.path.basename(f).split(".")[0][3:]))
         hash_pool = ThreadPool(os.cpu_count())
         hash_list = hash_pool.map(lambda image_path: options.settings.hash_image(Image.open(image_path)), image_files)
     finally:
