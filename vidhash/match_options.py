@@ -43,6 +43,10 @@ def _has_overlap(hash1: VideoHash, hash2: VideoHash, required_overlap: float, ha
     return False
 
 
+def _shorter_longer(hash1: VideoHash, hash2: VideoHash) -> Tuple[VideoHash, VideoHash]:
+    return (hash1, hash2) if hash1.video_length < hash2.video_length else (hash2, hash1)
+
+
 @dataclass(eq=True, frozen=True)
 class PercentageMatch(MatchOptions):
     percentage_overlap: float = 30
@@ -103,7 +107,7 @@ class DurationMatch(MatchOptions):
             frame_count,
             self.hamming_dist,
         )
-        shorter, longer = (hash1, hash2) if hash1.video_length < hash2.video_length else (hash2, hash1)
+        shorter, longer = _shorter_longer(hash1, hash2)
         for frame_num1 in range(len(shorter.image_hashes)):
             for frame_num2 in range(len(longer.image_hashes)):
                 if self._check_match_from(shorter, frame_num1, longer, frame_num2, frame_count):
