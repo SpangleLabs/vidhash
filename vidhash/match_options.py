@@ -4,7 +4,9 @@ import logging
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, Iterable
+
+import imagehash
 
 if TYPE_CHECKING:
     from vidhash.video_hash import VideoHash
@@ -32,9 +34,14 @@ class MatchOptions(ABC):
         pass
 
 
-def _has_overlap(hash1: VideoHash, hash2: VideoHash, required_overlap: float, hamming_distance: int) -> bool:
+def _has_overlap(
+        frame_hashes: Iterable[imagehash.ImageHash],
+        hash2: VideoHash,
+        required_overlap: float,
+        hamming_distance: int
+) -> bool:
     overlaps = 0
-    for image_hash in hash1.hash_set:
+    for image_hash in frame_hashes:
         if hash2.contains_hash(image_hash, hamming_distance):
             overlaps += 1
             logger.debug("Found %s of %s overlaps", overlaps, required_overlap)
@@ -53,11 +60,12 @@ class PercentageMatch(MatchOptions):
     ignore_blank: bool = True
 
     def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
-        required_overlap = self.percentage_overlap * min(len(hash1.hash_set), len(hash2.hash_set)) / 100
+        required_overlap = self.percentage_overlap * min(len(hash1.image_hashes), len(hash2.image_hashes)) / 100
         logger.debug(
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
-        return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
+        shorter, longer = _shorter_longer(hash1, hash2)
+        return _has_overlap(shorter.image_hashes, longer, required_overlap, self.hamming_dist)
 
 
 @dataclass(eq=True, frozen=True)
@@ -70,7 +78,7 @@ class AbsoluteMatch(MatchOptions):
         logger.debug(
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
-        return _has_overlap(hash1, hash2, required_overlap, self.hamming_dist)
+        return _has_overlap(hash1.hash_set, hash2, required_overlap, self.hamming_dist)
 
 
 @dataclass(eq=True, frozen=True)
