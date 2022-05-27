@@ -74,8 +74,13 @@ def _cleanup_dir(path: str) -> None:
 async def _decompose_video(video_path: str, decompose_path: str, fps: float, max_size: float) -> None:
     # Convert video and downscale
     output_path = str(pathlib.Path(TEMP_DIR) / f"{uuid.uuid4()}.mp4")
+    # Minimum dimension should be scaled down to max_size, if video is at least that big
     filters = [
-        f"scale='min({max_size},iw)':'min({max_size},ih)':force_original_aspect_ratio=decrease",
+        f"scale=" + ":".join([
+            f"'iw/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
+            f"'ih/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
+            "force_original_aspect_ratio=decrease"
+        ]),
         "scale=trunc(iw/2)*2:trunc(ih/2)*2",
     ]
     os.makedirs(TEMP_DIR, exist_ok=True)
@@ -85,7 +90,7 @@ async def _decompose_video(video_path: str, decompose_path: str, fps: float, max
             inputs={video_path: None},
             outputs={output_path: f"-vf \"{','.join(filters)}\""},
         )
-        # Decompose it
+        # Decompose video into frames
         os.makedirs(decompose_path, exist_ok=True)
         logger.debug("Decomposing video (%s) into frames in %s at %s FPS", output_path, decompose_path, fps)
         await _run_ffmpeg(
