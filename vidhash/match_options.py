@@ -65,9 +65,12 @@ class PercentageMatch(MatchOptions):
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
         shorter, longer = _shorter_longer(hash1, hash2)
-        image_hashes = [
-            frame_hash for frame_hash in shorter.image_hashes if frame_hash != shorter.hash_options.settings.blank_hash
-        ]
+        image_hashes = shorter.image_hashes.copy()
+        if self.ignore_blank:
+            blank_hash = shorter.hash_options.settings.blank_hash
+            image_hashes = [
+                frame_hash for frame_hash in image_hashes if frame_hash != blank_hash
+            ]
         return self._has_overlap(image_hashes, longer, required_overlap, self.ignore_blank)
 
 
@@ -82,7 +85,8 @@ class FrameCountMatch(MatchOptions):
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
         hash_set = hash1.hash_set.copy()
-        hash_set.discard(hash1.hash_options.settings.blank_hash)
+        if self.ignore_blank:
+            hash_set.discard(hash1.hash_options.settings.blank_hash)
         return self._has_overlap(hash_set, hash2, required_overlap, self.ignore_blank)
 
 
