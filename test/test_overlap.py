@@ -1,8 +1,3 @@
-# - - cut two scenes with two second overlap,
-# check different match metrics.
-# 5 frames, 20 frames,
-# 5%, 15%,
-# 1 second, 3 second.
 import vidhash
 from vidhash.match_options import FrameCountMatch, PercentageMatch, DurationMatch
 

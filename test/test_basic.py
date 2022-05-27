@@ -1,8 +1,6 @@
-import pytest
-
 import vidhash
 from vidhash import VideoHash
-from vidhash.match_options import FrameCountMatch, DEFAULT_MATCH_OPTS, PercentageMatch
+from vidhash.match_options import FrameCountMatch, PercentageMatch
 
 
 async def test_long_video_length(long_video):
@@ -74,9 +72,3 @@ async def test_scene_matches_subscene(butterfly_react_clip, both_butterflies_cli
     both_hash = await vidhash.hash_video(str(both_butterflies_clip))
     assert react_hash.matches_hash(both_hash)
     assert both_hash.matches_hash(react_hash)
-
-
-# - - cut two scenes from big buck bunny, ensure they don't match.
-# - - cut two scenes with two second overlap, check different match metrics. 5 frames, 20 frames, 5%, 15%, 1 second, 3 second.
-# - - check scene matches itself
-# - - check small scene matches full video?
