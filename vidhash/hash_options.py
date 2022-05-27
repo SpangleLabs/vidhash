@@ -36,7 +36,7 @@ class DHash(HashSettings):
 
     @property
     def video_size(self) -> int:
-        return self.hash_size * 10
+        return self.hash_size * 100
 
     @property
     def blank_hash(self) -> imagehash.ImageHash:
