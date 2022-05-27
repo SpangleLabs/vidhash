@@ -4,8 +4,6 @@
 
 ## Todo
 - Code
-  - Ability to ignore blank frames
-  - Ensure hash settings are the same when checking similarity
   - Wrapper for imagehash.ImageHash
   - Datastore
     - (For looking up matching videos from a collection)
