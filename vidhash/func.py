@@ -9,7 +9,7 @@ import subprocess
 import uuid
 from dataclasses import dataclass
 from multiprocessing.pool import ThreadPool
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 import ffmpy3
 from PIL import Image
@@ -23,6 +23,8 @@ if TYPE_CHECKING:
 
     from vidhash.hash_options import HashOptions
     from vidhash.match_options import MatchOptions
+
+PathLike = TypeVar("PathLike", str, pathlib.Path)
 
 TEMP_DIR = "vidhash_temp/"
 
@@ -71,7 +73,7 @@ def _cleanup_dir(path: str) -> None:
         pass
 
 
-async def _decompose_video(video_path: str, decompose_path: str, fps: float, max_size: float) -> None:
+async def _decompose_video(video_path: PathLike, decompose_path: str, fps: float, max_size: float) -> None:
     # Convert video and downscale
     output_path = str(pathlib.Path(TEMP_DIR) / f"{uuid.uuid4()}.mp4")
     # Minimum dimension should be scaled down to max_size, if video is at least that big
@@ -87,7 +89,7 @@ async def _decompose_video(video_path: str, decompose_path: str, fps: float, max
     try:
         logger.debug("Converting and downscaling video %s to %s", video_path, output_path)
         await _run_ffmpeg(
-            inputs={video_path: None},
+            inputs={str(video_path): None},
             outputs={output_path: f"-vf \"{','.join(filters)}\""},
         )
         # Decompose video into frames
@@ -113,7 +115,7 @@ async def _video_length(video_path: str) -> float:
     return float(out)
 
 
-async def hash_video(video_path: str, hash_options: HashOptions = None) -> VideoHash:
+async def hash_video(video_path: PathLike, hash_options: HashOptions = None) -> VideoHash:
     options = hash_options or DEFAULT_HASH_OPTS
     logger.info("Hashing video: %s with options: %s", video_path, hash_options)
     # Get video length
@@ -142,7 +144,7 @@ class CheckOptions:
     match_options: MatchOptions = DEFAULT_MATCH_OPTS
 
 
-async def check_match(video_path_1: str, video_path_2: str, options: CheckOptions = None) -> bool:
+async def check_match(video_path_1: PathLike, video_path_2: PathLike, options: CheckOptions = None) -> bool:
     options = options or CheckOptions(DEFAULT_HASH_OPTS, DEFAULT_MATCH_OPTS)
     hash1 = await hash_video(video_path_1, options.hash_options)
     hash2 = await hash_video(video_path_2, options.hash_options)
