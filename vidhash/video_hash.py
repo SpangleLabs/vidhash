@@ -24,13 +24,21 @@ class VideoHash:
     def hash_set(self) -> Set[imagehash.ImageHash]:
         return set(self.image_hashes)
 
-    def matching_hashes(self, other_hash: imagehash.ImageHash, hamming_dist: int = 0) -> Iterator[imagehash.ImageHash]:
-        for image_hash in self.hash_set:
+    def matching_hashes(
+            self,
+            other_hash: imagehash.ImageHash,
+            hamming_dist: int = 0,
+            ignore_blank: bool = False
+    ) -> Iterator[imagehash.ImageHash]:
+        hash_set = self.hash_set.copy()
+        if ignore_blank:
+            hash_set.discard(self.hash_options.settings.blank_hash)
+        for image_hash in hash_set:
             if (image_hash - other_hash) <= hamming_dist:
                 yield image_hash
 
-    def contains_hash(self, other_hash: imagehash.ImageHash, hamming_dist: int = 0) -> bool:
-        return any(self.matching_hashes(other_hash, hamming_dist))
+    def contains_hash(self, other_hash: imagehash.ImageHash, hamming_dist: int = 0, ignore_blank: bool = False) -> bool:
+        return any(self.matching_hashes(other_hash, hamming_dist, ignore_blank))
 
     def matches_hash(self, other_hash: VideoHash, match_options: MatchOptions = None) -> bool:
         match_options = match_options or DEFAULT_MATCH_OPTS

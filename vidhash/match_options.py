@@ -33,21 +33,21 @@ class MatchOptions(ABC):
     def _check_match(self, hash1: VideoHash, hash2: VideoHash) -> bool:
         pass
 
-
-def _has_overlap(
-        frame_hashes: Iterable[imagehash.ImageHash],
-        hash2: VideoHash,
-        required_overlap: float,
-        hamming_distance: int
-) -> bool:
-    overlaps = 0
-    for image_hash in frame_hashes:
-        if hash2.contains_hash(image_hash, hamming_distance):
-            overlaps += 1
-            logger.debug("Found %s of %s overlaps", overlaps, required_overlap)
-            if overlaps >= required_overlap:
-                return True
-    return False
+    def _has_overlap(
+            self,
+            frame_hashes: Iterable[imagehash.ImageHash],
+            hash2: VideoHash,
+            required_overlap: float,
+            ignore_blank: bool
+    ) -> bool:
+        overlaps = 0
+        for image_hash in frame_hashes:
+            if hash2.contains_hash(image_hash, self.hamming_dist, ignore_blank):
+                overlaps += 1
+                logger.debug("Found %s of %s overlaps", overlaps, required_overlap)
+                if overlaps >= required_overlap:
+                    return True
+        return False
 
 
 def _shorter_longer(hash1: VideoHash, hash2: VideoHash) -> Tuple[VideoHash, VideoHash]:
@@ -65,7 +65,10 @@ class PercentageMatch(MatchOptions):
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
         shorter, longer = _shorter_longer(hash1, hash2)
-        return _has_overlap(shorter.image_hashes, longer, required_overlap, self.hamming_dist)
+        image_hashes = [
+            frame_hash for frame_hash in shorter.image_hashes if frame_hash != shorter.hash_options.settings.blank_hash
+        ]
+        return self._has_overlap(image_hashes, longer, required_overlap, self.ignore_blank)
 
 
 @dataclass(eq=True, frozen=True)
@@ -78,7 +81,9 @@ class FrameCountMatch(MatchOptions):
         logger.debug(
             "Match will require at least %s frames with hamming distance %s", required_overlap, self.hamming_dist
         )
-        return _has_overlap(hash1.hash_set, hash2, required_overlap, self.hamming_dist)
+        hash_set = hash1.hash_set.copy()
+        hash_set.discard(hash1.hash_options.settings.blank_hash)
+        return self._has_overlap(hash_set, hash2, required_overlap, self.ignore_blank)
 
 
 @dataclass(eq=True, frozen=True)
