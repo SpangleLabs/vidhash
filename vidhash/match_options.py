@@ -69,7 +69,7 @@ class PercentageMatch(MatchOptions):
 
 
 @dataclass(eq=True, frozen=True)
-class AbsoluteMatch(MatchOptions):
+class FrameCountMatch(MatchOptions):
     count_overlap: int = 3
     ignore_blank: bool = True
 

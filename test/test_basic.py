@@ -2,7 +2,7 @@ import pytest
 
 import vidhash
 from vidhash import VideoHash
-from vidhash.match_options import AbsoluteMatch, DEFAULT_MATCH_OPTS, PercentageMatch
+from vidhash.match_options import FrameCountMatch, DEFAULT_MATCH_OPTS, PercentageMatch
 
 
 async def test_long_video_length(long_video):
@@ -58,14 +58,14 @@ async def test_two_different_scenes(butterfly_react_clip, butterfly_kill_clip):
 async def test_blank_match(intro_clip, credits_clip):
     intro_hash = await vidhash.hash_video(str(intro_clip))
     credits_hash = await vidhash.hash_video(str(credits_clip))
-    match = AbsoluteMatch(hamming_dist=0, count_overlap=1, ignore_blank=False)
+    match = FrameCountMatch(hamming_dist=0, count_overlap=1, ignore_blank=False)
     assert match.check_match(intro_hash, credits_hash)
 
 
 async def test_blank_skip_no_match(intro_clip, credits_clip):
     intro_hash = await vidhash.hash_video(str(intro_clip))
     credits_hash = await vidhash.hash_video(str(credits_clip))
-    match = AbsoluteMatch(hamming_dist=0, count_overlap=1, ignore_blank=True)
+    match = FrameCountMatch(hamming_dist=0, count_overlap=1, ignore_blank=True)
     assert not match.check_match(intro_hash, credits_hash)
 
 
