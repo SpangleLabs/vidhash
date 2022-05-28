@@ -1,5 +1,5 @@
 import vidhash
-from vidhash.match_options import FrameCountMatch, PercentageMatch, DurationMatch
+from vidhash.match_options import DurationMatch, FrameCountMatch, PercentageMatch
 
 
 async def test_few_frames_count(butterfly_react_clip, butterfly_react_2sec_overlap_clip):

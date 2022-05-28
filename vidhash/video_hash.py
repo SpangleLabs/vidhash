@@ -25,10 +25,7 @@ class VideoHash:
         return set(self.image_hashes)
 
     def matching_hashes(
-            self,
-            other_hash: imagehash.ImageHash,
-            hamming_dist: int = 0,
-            ignore_blank: bool = False
+        self, other_hash: imagehash.ImageHash, hamming_dist: int = 0, ignore_blank: bool = False
     ) -> Iterator[imagehash.ImageHash]:
         hash_set = self.hash_set.copy()
         if ignore_blank:

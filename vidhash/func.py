@@ -78,11 +78,14 @@ async def _decompose_video(video_path: PathLike, decompose_path: str, fps: float
     output_path = str(pathlib.Path(TEMP_DIR) / f"{uuid.uuid4()}.mp4")
     # Minimum dimension should be scaled down to max_size, if video is at least that big
     filters = [
-        f"scale=" + ":".join([
-            f"'iw/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
-            f"'ih/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
-            "force_original_aspect_ratio=decrease"
-        ]),
+        "scale="
+        + ":".join(
+            [
+                f"'iw/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
+                f"'ih/(min(iw,ih)/min(min(iw,ih),{max_size}))'",
+                "force_original_aspect_ratio=decrease",
+            ]
+        ),
         "scale=trunc(iw/2)*2:trunc(ih/2)*2",
     ]
     os.makedirs(TEMP_DIR, exist_ok=True)
@@ -105,10 +108,10 @@ async def _decompose_video(video_path: PathLike, decompose_path: str, fps: float
         _cleanup_file(output_path)
 
 
-async def _video_length(video_path: str) -> float:
+async def _video_length(video_path: PathLike) -> float:
     logger.debug("Getting length of video %s", video_path)
     out, err = await _run_ffprobe(
-        inputs={video_path: "-show_entries format=duration -of default=noprint_wrappers=1:nokey=1"},
+        inputs={str(video_path): "-show_entries format=duration -of default=noprint_wrappers=1:nokey=1"},
         global_options=["-v error"],
     )
     logger.debug("Length of video %s is: %s", video_path, out)

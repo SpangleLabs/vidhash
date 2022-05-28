@@ -4,11 +4,13 @@ import logging
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Tuple, Iterable
-
-import imagehash
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Iterable, Tuple
+
+    import imagehash
+
     from vidhash.video_hash import VideoHash
 
 
@@ -34,11 +36,7 @@ class MatchOptions(ABC):
         pass
 
     def _has_overlap(
-            self,
-            frame_hashes: Iterable[imagehash.ImageHash],
-            hash2: VideoHash,
-            required_overlap: float,
-            ignore_blank: bool
+        self, frame_hashes: Iterable[imagehash.ImageHash], hash2: VideoHash, required_overlap: float, ignore_blank: bool
     ) -> bool:
         overlaps = 0
         for image_hash in frame_hashes:
@@ -68,9 +66,7 @@ class PercentageMatch(MatchOptions):
         image_hashes = shorter.image_hashes.copy()
         if self.ignore_blank:
             blank_hash = shorter.hash_options.settings.blank_hash
-            image_hashes = [
-                frame_hash for frame_hash in image_hashes if frame_hash != blank_hash
-            ]
+            image_hashes = [frame_hash for frame_hash in image_hashes if frame_hash != blank_hash]
         return self._has_overlap(image_hashes, longer, required_overlap, self.ignore_blank)
 
 
