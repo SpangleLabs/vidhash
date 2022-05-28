@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vidhash"
-version = "0.2.0"
+version = "0.2.1"
 description = "A package for hashing videos and checking for similarity"
 authors = ["Your Name <you@example.com>"]
 license = "MIT"
