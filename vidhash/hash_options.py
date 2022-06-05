@@ -7,10 +7,14 @@ from typing import TYPE_CHECKING
 import imagehash
 import numpy as np
 
+from vidhash.frame_hash import SimpleImageHash
+
 if TYPE_CHECKING:
     from typing import Optional
 
     from PIL.Image import Image
+
+    from vidhash.frame_hash import FrameHash
 
 
 class HashSettings(ABC):
@@ -20,11 +24,11 @@ class HashSettings(ABC):
 
     @property
     @abstractmethod
-    def blank_hash(self) -> imagehash.ImageHash:
+    def blank_hash(self) -> FrameHash:
         pass
 
     @abstractmethod
-    def hash_image(self, img: Image) -> imagehash.ImageHash:
+    def hash_image(self, img: Image) -> FrameHash:
         pass
 
 
@@ -33,8 +37,8 @@ class DHash(HashSettings):
     hash_size: int = 8
     video_size: Optional[int] = None
 
-    def hash_image(self, img: Image) -> imagehash.ImageHash:
-        return imagehash.dhash(img, hash_size=self.hash_size)
+    def hash_image(self, img: Image) -> FrameHash:
+        return SimpleImageHash(imagehash.dhash(img, hash_size=self.hash_size))
 
     def get_video_size(self) -> int:
         if self.video_size is None:
@@ -42,8 +46,8 @@ class DHash(HashSettings):
         return self.video_size
 
     @property
-    def blank_hash(self) -> imagehash.ImageHash:
-        return imagehash.ImageHash(np.zeros([self.hash_size, self.hash_size], dtype=bool))
+    def blank_hash(self) -> FrameHash:
+        return SimpleImageHash(imagehash.ImageHash(np.zeros([self.hash_size, self.hash_size], dtype=bool)))
 
 
 @dataclass(eq=True, frozen=True)
