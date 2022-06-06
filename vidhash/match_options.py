@@ -103,7 +103,7 @@ class DurationMatch(MatchOptions):
         if len(remaining_frames1) < target_length or len(remaining_frames2) < target_length:
             return False
         for frame1, frame2 in zip(remaining_frames1, remaining_frames2):
-            if frame1.similar_to(frame2, self.hamming_dist):
+            if not frame1.similar_to(frame2, self.hamming_dist):
                 return False
             match_count += 1
             if match_count >= target_length:
