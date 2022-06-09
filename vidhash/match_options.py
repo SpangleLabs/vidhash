@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Iterable, Tuple
 
-    import imagehash
-
+    from vidhash.frame_hash import FrameHash
     from vidhash.video_hash import VideoHash
 
 
@@ -36,7 +35,7 @@ class MatchOptions(ABC):
         pass
 
     def _has_overlap(
-        self, frame_hashes: Iterable[imagehash.ImageHash], hash2: VideoHash, required_overlap: float, ignore_blank: bool
+        self, frame_hashes: Iterable[FrameHash], hash2: VideoHash, required_overlap: float, ignore_blank: bool
     ) -> bool:
         overlaps = 0
         for image_hash in frame_hashes:
@@ -104,7 +103,7 @@ class DurationMatch(MatchOptions):
         if len(remaining_frames1) < target_length or len(remaining_frames2) < target_length:
             return False
         for frame1, frame2 in zip(remaining_frames1, remaining_frames2):
-            if (frame1 - frame2) > self.hamming_dist:
+            if not frame1.similar_to(frame2, self.hamming_dist):
                 return False
             match_count += 1
             if match_count >= target_length:
