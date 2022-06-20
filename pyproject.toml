@@ -26,6 +26,7 @@ requests = "^2.27.1"
 pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
 types-requests = "^2.27.29"
+taskipy = "^1.10.2"
 
 [tool.black]
 line-length = 120
@@ -43,3 +44,13 @@ line_length = 120
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.taskipy.tasks]
+lint_flake8 = "flake8"
+lint_mypy = "mypy vidhash test"
+lint_isort = "isort vidhash test --check"
+lint = "task lint_flake8 && task lint_mypy && task lint_isort"
+format_isort = "isort vidhash test"
+format_black = "black vidhash"
+autoformat = "task format_black && task format_isort"
+test = "pytest"
