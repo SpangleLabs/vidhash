@@ -19,11 +19,8 @@ jobs:
           pip install poetry
           poetry install
       - name: "Run flake8"
-        run: |
-          poetry run flake8
+        run: task lint_flake8
       - name: "Run mypy"
-        run: |
-          poetry run mypy vidhash test
+        run: task lint_mypy
       - name: "Run isort"
-        run: |
-          poetry run isort vidhash test --check
+        run: task lint_isort
