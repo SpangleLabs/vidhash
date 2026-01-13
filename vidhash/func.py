@@ -118,7 +118,7 @@ async def _video_length(video_path: PathLike) -> float:
     return float(out)
 
 
-async def hash_video(video_path: PathLike, hash_options: HashOptions = None) -> VideoHash:
+async def hash_video(video_path: PathLike, hash_options: Optional[HashOptions] = None) -> VideoHash:
     options = hash_options or DEFAULT_HASH_OPTS
     logger.info("Hashing video: %s with options: %s", video_path, hash_options)
     # Get video length
@@ -147,7 +147,7 @@ class CheckOptions:
     match_options: MatchOptions = DEFAULT_MATCH_OPTS
 
 
-async def check_match(video_path_1: PathLike, video_path_2: PathLike, options: CheckOptions = None) -> bool:
+async def check_match(video_path_1: PathLike, video_path_2: PathLike, options: Optional[CheckOptions] = None) -> bool:
     options = options or CheckOptions(DEFAULT_HASH_OPTS, DEFAULT_MATCH_OPTS)
     hash1 = await hash_video(video_path_1, options.hash_options)
     hash2 = await hash_video(video_path_2, options.hash_options)

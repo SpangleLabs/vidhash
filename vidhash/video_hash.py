@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from vidhash.match_options import DEFAULT_MATCH_OPTS
 
@@ -36,7 +36,7 @@ class VideoHash:
     def contains_hash(self, other_hash: FrameHash, hamming_dist: int = 0, ignore_blank: bool = False) -> bool:
         return any(self.matching_hashes(other_hash, hamming_dist, ignore_blank))
 
-    def matches_hash(self, other_hash: VideoHash, match_options: MatchOptions = None) -> bool:
+    def matches_hash(self, other_hash: VideoHash, match_options: Optional[MatchOptions] = None) -> bool:
         match_options = match_options or DEFAULT_MATCH_OPTS
         return match_options.check_match(self, other_hash)
 
